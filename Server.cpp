@@ -1,0 +1,98 @@
+#include "Server.h"
+
+void Server::Setup(char* serverIP,int TCP_port, int UDP_port) {
+
+    listener_TCP_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if(listener_TCP_socket < 0)
+    {
+        fprintf(stderr, "socket\n");
+        exit(1);
+    }
+
+    serverAddress.sin_family = AF_INET;
+    //serverAddress.sin_addr.s_addr = htonl(inet_addr(serverIP));
+    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddress.sin_port = htons(TCP_port);
+    if(bind(listener_TCP_socket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
+    {
+        fprintf(stderr, "bind\n");
+        exit(2);
+    }
+
+    listen(listener_TCP_socket, MAX_CLIENT);
+}
+
+int Server::Accept_TCP()
+{
+    int sock = accept(listener_TCP_socket, NULL, NULL);
+    return sock;
+}
+
+void Server::Send(int socket, char* message)
+{
+    send(socket, message, strlen(message), 0);
+}
+
+int Server::Recieve(int socket)
+{
+    int bytes_read;
+    bytes_read = recv(socket, recieve_buf, MAXPACKETSIZE, 0);
+    printf("Recieve message: %s\n",recieve_buf );
+    return bytes_read;
+}
+
+char* Server::Parse_message()
+{
+    bool has_digits = false;
+    char temp_parse[1024];
+    temp_parse[0] = 0;
+    char temp_symb[1];
+    temp_symb[0] = 0;
+    std::list<int> digits;
+    int temp_i = 0;
+    char send_string[1024];
+    send_string[0] = 0;
+    int digits_summ = 0;
+    char* ret;
+
+    for (int i = 0; recieve_buf[i] != '\0'; i++) {
+        if (isdigit(recieve_buf[i])) {
+            has_digits = true;
+            sprintf(temp_symb, "%c", recieve_buf[i]);
+            strcat(temp_parse, temp_symb);
+            temp_i++;
+            if(recieve_buf[i+1] == '\0')
+                digits.push_back(atoi(temp_parse));
+        }
+        else if (temp_i > 0) {
+            digits.push_back(atoi(temp_parse));
+            temp_parse[0] = 0;
+            temp_i = 0;
+        }
+    }
+
+    if (has_digits) {
+        digits.sort();
+        int digit_size = digits.size();
+        for(int i = 0; i < digit_size; i++) {
+            sprintf(temp_parse, "%d", digits.front());
+            strcat(send_string, temp_parse);
+            strcat(send_string, " ");
+            digits_summ += digits.front();
+            digits.pop_front();
+        }
+
+        strcat(send_string, "\n");
+        sprintf(temp_parse, "%d", digits_summ);
+        strcat(send_string, temp_parse);
+        strcat(send_string, "\n");
+        printf("Parsed message: %s\n",send_string );
+
+        ret = send_string;
+        return ret;
+    }
+
+    ret = recieve_buf;
+    return ret;
+        
+}
