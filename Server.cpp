@@ -34,6 +34,11 @@ void Server::Send(int socket, char* message)
     send(socket, message, strlen(message), 0);
 }
 
+char* Server::Get_Buffer()
+{
+    return recieve_buf;
+}
+
 int Server::Recieve(int socket)
 {
     int bytes_read;
@@ -42,12 +47,12 @@ int Server::Recieve(int socket)
     return bytes_read;
 }
 
-char* Server::Parse_message()
+char* Server::Parse_message(char* buffer)
 {
     bool has_digits = false;
     char temp_parse[1024] = "";
     char temp_symb[3];
-    sprintf(temp_symb, "%c", recieve_buf[0]);
+    sprintf(temp_symb, "%c", buffer[0]);
     std::list<int> digits;
     int temp_i = 0;
     char send_string[1024];
@@ -55,13 +60,13 @@ char* Server::Parse_message()
     int digits_summ = 0;
     char* ret;
 
-    for (int i = 0; recieve_buf[i] != '\0'; i++) {
+    for (int i = 0; buffer[i] != '\0'; i++) {
 #ifdef Trace
-        printf("Symb: %c\n",recieve_buf[i]);
+        printf("Symb: %c\n",buffer[i]);
 #endif
-        if (isdigit(recieve_buf[i])) {
+        if (isdigit(buffer[i])) {
             has_digits = true;
-            sprintf(temp_symb, "%c", recieve_buf[i]);
+            sprintf(temp_symb, "%c", buffer[i]);
 #ifdef Trace
             printf("temp_symb: %s\n",temp_symb);
 #endif
@@ -69,7 +74,7 @@ char* Server::Parse_message()
 #ifdef Trace
             printf("temp_parse: %s\n",temp_parse);
 #endif
-            if(recieve_buf[i+1] == '\0' || !isdigit(recieve_buf[i+1])) {
+            if(buffer[i+1] == '\0' || !isdigit(buffer[i+1])) {
                 digits.push_back(atoi(temp_parse));
 #ifdef Trace
                 printf("List: %d\n",digits.back());
@@ -100,7 +105,7 @@ char* Server::Parse_message()
         return ret;
     }
 
-    ret = recieve_buf;
+    ret = buffer;
     return ret;
         
 }

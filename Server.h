@@ -10,6 +10,7 @@
 #include <cstdlib> 
 #include <cstring>
 #include <list>
+#include <pthread.h>
 
 
 #define MAXPACKETSIZE 1024
@@ -23,6 +24,7 @@ class Server
 	int coonected_socked;
 	struct sockaddr_in serverAddress;
 	pthread_t serverThread[ MAX_CLIENT ];
+	pthread_mutex_t mutex;
 
 	char recieve_buf[ MAXPACKETSIZE ];
 
@@ -30,6 +32,7 @@ class Server
 	void Setup(char* serverIP, int TCP_port, int UDP_port);
 	int Accept_TCP();
 	void Send(int socket, char* message);
+	char* Get_Buffer();
 	int Recieve(int socket);
-	char* Parse_message();
+	char* Parse_message(char* buffer);
 };

@@ -20,6 +20,11 @@ int main(int argc, char *argv[])
     int input;
     std::string read_message;
 
+    if (argc != 4) {
+		fprintf(stderr, "Usage:  %s <Server IP> <Server Port> <TCP/UDP>\n", argv[0]);
+		exit(1);
+	}
+
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock < 0)
     {

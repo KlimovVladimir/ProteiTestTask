@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(TCP/UDP_Server)			# Название проекта
 
+SET(CMAKE_CXX_FLAGS -pthread)
+
 set(SOURCE_EXE main.cpp)		# Установка переменной со списком исходников для исполняемого файла
 
 set(SOURCE_LIB Server.cpp)			# Тоже самое, но для библиотеки
