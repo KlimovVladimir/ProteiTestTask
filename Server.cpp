@@ -2,6 +2,7 @@
 
 void Server::Setup(char* serverIP,int TCP_port, int UDP_port) {
 
+    recieve_buf[0] = 0;
     listener_TCP_socket = socket(AF_INET, SOCK_STREAM, 0);
     if(listener_TCP_socket < 0)
     {
@@ -44,10 +45,9 @@ int Server::Recieve(int socket)
 char* Server::Parse_message()
 {
     bool has_digits = false;
-    char temp_parse[1024];
-    temp_parse[0] = 0;
-    char temp_symb[1];
-    temp_symb[0] = 0;
+    char temp_parse[1024] = "";
+    char temp_symb[3];
+    sprintf(temp_symb, "%c", recieve_buf[0]);
     std::list<int> digits;
     int temp_i = 0;
     char send_string[1024];
@@ -56,18 +56,26 @@ char* Server::Parse_message()
     char* ret;
 
     for (int i = 0; recieve_buf[i] != '\0'; i++) {
+#ifdef Trace
+        printf("Symb: %c\n",recieve_buf[i]);
+#endif
         if (isdigit(recieve_buf[i])) {
             has_digits = true;
             sprintf(temp_symb, "%c", recieve_buf[i]);
+#ifdef Trace
+            printf("temp_symb: %s\n",temp_symb);
+#endif
             strcat(temp_parse, temp_symb);
-            temp_i++;
-            if(recieve_buf[i+1] == '\0')
+#ifdef Trace
+            printf("temp_parse: %s\n",temp_parse);
+#endif
+            if(recieve_buf[i+1] == '\0' || !isdigit(recieve_buf[i+1])) {
                 digits.push_back(atoi(temp_parse));
-        }
-        else if (temp_i > 0) {
-            digits.push_back(atoi(temp_parse));
-            temp_parse[0] = 0;
-            temp_i = 0;
+#ifdef Trace
+                printf("List: %d\n",digits.back());
+#endif
+                temp_parse[0] = 0;
+            }
         }
     }
 

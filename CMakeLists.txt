@@ -11,3 +11,5 @@ add_library(Server STATIC ${SOURCE_LIB})	# Создание статическо
 add_executable(main ${SOURCE_EXE})	# Создает исполняемый файл с именем main
 
 target_link_libraries(main Server)		# Линковка программы с библиотекой
+
+add_executable(client client.cpp)	# Создает исполняемый файл с именем main
