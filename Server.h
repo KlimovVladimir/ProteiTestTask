@@ -19,10 +19,14 @@
 class Server
 {
 	private:
-	int sock_TCP, listener_TCP_socket;
-	int sock_UDP, listener_UDP_socket;
+	int listener_TCP_socket;
+	int listener_UDP_socket;
 	int coonected_socked;
-	struct sockaddr_in serverAddress;
+	struct sockaddr_in serverAddress_TCP;
+	struct sockaddr_in serverAddress_UDP;
+	struct sockaddr_in clientAddress_UDP;
+	unsigned int clientAddressLen;
+	int recvMsgSize;
 	pthread_t serverThread[ MAX_CLIENT ];
 	pthread_mutex_t mutex;
 
@@ -31,8 +35,12 @@ class Server
 	public:
 	void Setup(char* serverIP, int TCP_port, int UDP_port);
 	int Accept_TCP();
-	void Send(int socket, char* message);
+	void TCP_Send(int socket, char* message);
+	void UDP_Send(int socket, char* message);
 	char* Get_Buffer();
-	int Recieve(int socket);
+	int Get_UDP_Socket();
+	int TCP_Recieve(int socket);
+	char* UDP_Recieve(int socket);
+	int TCPUDP_Recieve(int socket);
 	char* Parse_message(char* buffer);
 };
