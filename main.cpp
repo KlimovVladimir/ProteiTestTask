@@ -30,6 +30,7 @@ void *ClientTCPThread(void *threadArgs)
         	message = server.Parse_message(buffer);
         	pthread_mutex_unlock(&mutex);
         }
+        strcat(message,"@");
         server.TCP_Send(sock, message);
 	}
 	printf("Client disconnected!\n");

@@ -82,9 +82,20 @@ int main(int argc, char *argv[])
             if(strcmp(protocol, "TCP") == 0) {
                 send(sock, message, sizeof(message), 0);
                 recv(sock, buf, sizeof(buf), 0);
+
+                char buff[1024];
+                for(int i = 0; i < strlen(buf); i++){
+                    if(buf[i] != '@') {
+                        buff[i] = buf[i];
+                    }
+                    else {
+                        buff[i] = '\0';
+                        i = 1025;
+                    }
+                }
                 
                 std::cout<<"Сервер ответил следующее:\n";
-                std::cout<< buf << "\n";
+                std::cout<< buff << "\n";
             }
             else if(strcmp(protocol, "UDP") == 0) {
                 while (addr.sin_addr.s_addr != fromAddr.sin_addr.s_addr) {
